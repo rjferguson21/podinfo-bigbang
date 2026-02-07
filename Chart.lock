@@ -1,0 +1,9 @@
+dependencies:
+- name: podinfo
+  repository: https://stefanprodan.github.io/podinfo
+  version: 6.7.1
+- name: bb-common
+  repository: oci://registry1.dso.mil/bigbang
+  version: 0.14.0
+digest: sha256:53caef0d01b6bce8f5df6d7c30f6f1c778c66590f60a3576af36a6526eb6dd35
+generated: "2026-02-06T19:52:11.435909279-06:00"

@@ -22,3 +22,11 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "1.16.0"
+
+dependencies:
+  - name: podinfo
+    version: "6.7.1"
+    repository: "https://stefanprodan.github.io/podinfo"
+  - name: bb-common
+    version: "0.14.0"
+    repository: "oci://registry1.dso.mil/bigbang"
