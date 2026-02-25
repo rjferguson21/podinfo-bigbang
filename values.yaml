@@ -2,10 +2,23 @@ podinfo:
   image:
     repository: registry1.dso.mil/ironbank/opensource/bigbang/podinfo
     tag: 6.10.1
+  redis:
+    enabled: true
+    repository: registry1.dso.mil/ironbank/opensource/redis/redis8-slim
+    tag: 8.6.1
 
 bb-common:
   networkPolicies:
     enabled: true
+    ingress:
+      to:
+        redis:6379:
+          podSelector:
+            matchLabels:
+              app: podinfo-redis
+          from:
+            k8s:
+              default@podinfo/podinfo: true
   routes:
     inbound:
       podinfo:
@@ -20,3 +33,4 @@ bb-common:
     enabled: true
     authorizationPolicies:
       enabled: true
+      generateFromNetpol: true
