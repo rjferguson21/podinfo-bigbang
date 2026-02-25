@@ -1,7 +1,11 @@
+podinfo:
+  image:
+    repository: registry1.dso.mil/ironbank/opensource/bigbang/podinfo
+    tag: 6.10.1
+
 bb-common:
   networkPolicies:
     enabled: true
-
   routes:
     inbound:
       podinfo:
@@ -12,9 +16,7 @@ bb-common:
           - istio-gateway/public-ingressgateway
         service: podinfo
         port: 9898
-
   istio:
     enabled: true
-
     authorizationPolicies:
       enabled: true
