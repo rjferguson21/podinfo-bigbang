@@ -1,4 +1,4 @@
-podinfo:
+upstream:
   image:
     repository: registry1.dso.mil/ironbank/opensource/bigbang/podinfo
     tag: 6.10.1
@@ -15,10 +15,10 @@ bb-common:
         redis:6379:
           podSelector:
             matchLabels:
-              app: podinfo-redis
+              app: podinfo-upstream-redis
           from:
             k8s:
-              default@podinfo/podinfo: true
+              default@podinfo/podinfo-upstream: true
   routes:
     inbound:
       podinfo:
@@ -27,8 +27,10 @@ bb-common:
           - podinfo.dev.bigbang.mil
         gateways:
           - istio-gateway/public-ingressgateway
-        service: podinfo
+        service: podinfo-upstream
         port: 9898
+        selector:
+          app.kubernetes.io/name: podinfo-upstream
   istio:
     enabled: true
     authorizationPolicies:

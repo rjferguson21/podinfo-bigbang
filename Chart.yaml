@@ -25,6 +25,7 @@ appVersion: "1.16.0"
 
 dependencies:
   - name: podinfo
+    alias: upstream
     version: "6.7.1"
     repository: "https://stefanprodan.github.io/podinfo"
   - name: bb-common
