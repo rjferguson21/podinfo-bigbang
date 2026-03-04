@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: podinfo-bigbang
+  namespace: bigbang
+spec:
+  interval: 5m
+  url: https://repo1.dso.mil/big-bang/product/maintained/podinfo.git
+  ref:
+    branch: maintained

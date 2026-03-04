@@ -1,0 +1,18 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: podinfo-bigbang
+  namespace: bigbang
+spec:
+  targetNamespace: podinfo
+  interval: 5m
+  chart:
+    spec:
+      chart: .
+      sourceRef:
+        kind: GitRepository
+        name: podinfo-bigbang
+  valuesFrom:
+    - kind: ConfigMap
+      name: bigbang-platform-values
+      valuesKey: common.yaml
