@@ -1,4 +1,5 @@
-domain: dev.bigbang.mil
+global:
+  domain: dev.bigbang.mil
 
 upstream:
   image:
@@ -26,7 +27,7 @@ bb-common:
       podinfo:
         enabled: true
         hosts:
-          - podinfo.{{ .Values.domain }}
+          - podinfo.{{ .Values.global.domain }}
         gateways:
           - istio-gateway/public-ingressgateway
         service: podinfo-upstream
