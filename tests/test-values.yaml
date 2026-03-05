@@ -1,0 +1,10 @@
+packages:
+  podinfo:
+    namespace:
+      name: podinfo
+    helmRelease:
+      namespace: "bigbang"
+    enabled: true
+    sourceType: "git"
+    git:
+      repo: https://repo1.dso.mil/big-bang/product/maintained/podinfo.git
