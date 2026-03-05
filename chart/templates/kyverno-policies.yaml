@@ -17,11 +17,15 @@ spec:
               namespaces:
                 - {{ .Release.Namespace }}
       mutate:
-        patchStrategicMerge:
-          spec:
-            endpoints:
-              - scheme: https
-                tlsConfig:
+        foreach:
+          - list: "request.object.spec.endpoints"
+            patchesJson6902: |-
+              - op: add
+                path: /spec/endpoints/{{`{{elementIndex}}`}}/scheme
+                value: https
+              - op: add
+                path: /spec/endpoints/{{`{{elementIndex}}`}}/tlsConfig
+                value:
                   caFile: /etc/prom-certs/root-cert.pem
                   certFile: /etc/prom-certs/cert-chain.pem
                   keyFile: /etc/prom-certs/key.pem
