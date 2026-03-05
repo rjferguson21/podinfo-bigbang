@@ -1,0 +1,29 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ .Release.Name }}-mutate-servicemonitor-mtls
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  rules:
+    - name: add-mtls-to-endpoints
+      match:
+        any:
+          - resources:
+              kinds:
+                - ServiceMonitor
+              namespaces:
+                - {{ .Release.Namespace }}
+      mutate:
+        patchStrategicMerge:
+          spec:
+            endpoints:
+              - scheme: https
+                tlsConfig:
+                  caFile: /etc/prom-certs/root-cert.pem
+                  certFile: /etc/prom-certs/cert-chain.pem
+                  keyFile: /etc/prom-certs/key.pem
+                  insecureSkipVerify: true
+{{- end }}
