@@ -1,1 +1,0 @@
-{{- include "bb-common.network-policies.render" . }}

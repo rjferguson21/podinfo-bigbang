@@ -1,43 +1,45 @@
-domain: dev.bigbang.mil
+global:
+  domain: dev.bigbang.mil
 
-monitoring:
-  enabled: false
+  monitoring:
+    enabled: false
 
-networkPolicies:
-  enabled: true
-  ingress:
-    to:
-      podinfo-upstream:9898:
-        from:
-          k8s:
-            monitoring-monitoring-kube-prometheus@monitoring/prometheus:
-              enabled: "{{ .Values.monitoring.enabled }}"
-      redis:6379:
-        podSelector:
-          matchLabels:
-            app: podinfo-upstream-redis
-        from:
-          k8s:
-            default@podinfo/podinfo-upstream: true
-
-istio:
-  enabled: true
-  authorizationPolicies:
+bb-common:
+  networkPolicies:
     enabled: true
-    generateFromNetpol: true
+    ingress:
+      to:
+        podinfo-upstream:9898:
+          from:
+            k8s:
+              monitoring-monitoring-kube-prometheus@monitoring/prometheus:
+                enabled: "{{ .Values.global.monitoring.enabled }}"
+        redis:6379:
+          podSelector:
+            matchLabels:
+              app: podinfo-upstream-redis
+          from:
+            k8s:
+              default@podinfo/podinfo-upstream: true
 
-routes:
-  inbound:
-    podinfo:
+  istio:
+    enabled: true
+    authorizationPolicies:
       enabled: true
-      hosts:
-        - podinfo.{{ .Values.domain }}
-      gateways:
-        - istio-gateway/public-ingressgateway
-      service: podinfo-upstream
-      port: 9898
-      selector:
-        app.kubernetes.io/name: podinfo-upstream
+      generateFromNetpol: true
+
+  routes:
+    inbound:
+      podinfo:
+        enabled: true
+        hosts:
+          - podinfo.{{ .Values.global.domain }}
+        gateways:
+          - istio-gateway/public-ingressgateway
+        service: podinfo-upstream
+        port: 9898
+        selector:
+          app.kubernetes.io/name: podinfo-upstream
 
 upstream:
   image:
