@@ -1,5 +1,8 @@
 domain: dev.bigbang.mil
 
+monitoring:
+  enabled: false
+
 networkPolicies:
   enabled: true
   ingress:
@@ -7,7 +10,8 @@ networkPolicies:
       podinfo-upstream:9898:
         from:
           k8s:
-            monitoring-monitoring-kube-prometheus@monitoring/prometheus: true
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus:
+              enabled: "{{ .Values.monitoring.enabled }}"
       redis:6379:
         podSelector:
           matchLabels:
@@ -46,5 +50,3 @@ upstream:
     repository: registry1.dso.mil/ironbank/opensource/redis/redis8-slim
     tag: 8.6.1
 
-monitoring:
-  enabled: false

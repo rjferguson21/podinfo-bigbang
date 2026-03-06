@@ -3,7 +3,7 @@ dependencies:
   repository: https://stefanprodan.github.io/podinfo
   version: 6.7.1
 - name: bb-common
-  repository: oci://registry1.dso.mil/bigbang
-  version: 0.14.0
-digest: sha256:cb138d266943543731b74f9fe9258301c44fca55da2ce23abad46ed206e1cbe7
-generated: "2026-03-05T15:42:00.042086022-06:00"
+  repository: file:///home/rob/bb/bb-common/chart
+  version: 0.14.2
+digest: sha256:cb8a2905aa4c09f82b712e7f8c734e4569206b6992a87dded0bffd0d0233da7c
+generated: "2026-03-06T09:12:09.024808082-06:00"

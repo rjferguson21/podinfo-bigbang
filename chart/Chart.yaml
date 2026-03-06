@@ -29,5 +29,5 @@ dependencies:
     version: "6.7.1"
     repository: "https://stefanprodan.github.io/podinfo"
   - name: bb-common
-    version: "0.14.0"
-    repository: "oci://registry1.dso.mil/bigbang"
+    version: "0.14.2"
+    repository: "file:///home/rob/bb/bb-common/chart"
