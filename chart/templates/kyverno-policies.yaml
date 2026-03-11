@@ -1,4 +1,4 @@
-{{- if .Values.global.monitoring.enabled }}
+{{- if and .Values.global.monitoring.enabled (not .Values.global.ztunnel.enabled) }}
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
