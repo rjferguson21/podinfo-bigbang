@@ -4,6 +4,8 @@ global:
   monitoring:
     enabled: false
 
+  ambient: false
+
 bb-common:
   networkPolicies:
     enabled: true
