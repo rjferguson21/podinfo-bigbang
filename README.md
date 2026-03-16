@@ -1,72 +1,52 @@
-# Maintained Package Proposal
-
-* Update matained packages to leverage bb-common as a sub-chart
-* Focus on strict schema between maintained packages, and umbrella which will look like:
-
 ```yaml
-# Global Configuration (hopefully limited use, but useful for detecting what packages are enabled)
-global:
-  domain: dev.bigbang.mil
-  monitoring:
-    enabled: true
-
-# bb-common values (will accept bigbang istio configuration, network policies definitions, as well as package specific configuration)
-bb-common:
-  istio:
-    enabled: <bigbang istiod enabled>
-    authorizationPolicies:
-      enabled: <bigbang authz enabled>
-      generateFromNetpol: <bigbang generateFromNetpol enabled>
-
-  networkPolicies:
-   hbonePortInjection:
-    enabled: <bigbang ambient enabled enabled>
-
-    ingress:
-      definitions: <bigbang ingress definitions>
-    egress:
-      definitions: <bigbang egress definitions>
-
-# upstream, alias for upstream package (e.g. podinfo)
 upstream:
-  foo: bar
-```
+  image:
+    repository: registry1.dso.mil/ironbank/opensource/bigbang/podinfo
+    tag: 6.10.1
+  serviceMonitor:
+    enabled: true
+  redis:
+    enabled: true
+    repository: registry1.dso.mil/ironbank/opensource/redis/redis8-slim
+    tag: 8.6.1
 
-Example platform-values-configmap (deployed with bigbang, see [maintained branch](https://repo1.dso.mil/big-bang/bigbang/-/tree/maintained)):
+bb-common:
+  # schema validation to keep you on track
+  # foo: bar
+  networkPolicies:
+    enabled: true
+    # injects HBONE port into network policies to ensure ztunnel traffic is permitted
+    hbonePortInjection:
+      enabled: true
+    ingress:
+      to:
+        redis:6379:
+          podSelector:
+            matchLabels:
+              app: podinfo-upstream-redis
+          from:
+            k8s:
+              default@podinfo/podinfo-upstream: true
 
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Release.Name }}-platform-values
-  namespace: {{ .Release.Namespace }}
-data:
-  common.yaml: |
-    global:
-      domain: {{ .Values.domain }}
-      monitoring:
-        enabled: {{ .Values.monitoring.enabled }}
-    bb-common:
-      istio:
-        enabled: {{ $istioEnabled }}
-        hardened:
-          enabled: {{ $istioHardened }}
-        sidecar:
-          enabled: {{ $istioHardened }}
-        authorizationPolicies:
-          enabled: {{ $istioHardened }}
-          generateFromNetpol: {{ $istioHardened }}
-      networkPolicies:
-        {{- .Values.networkPolicies | toYaml | nindent 8 }}
-```
+  istio:
+    enabled: true
+    sidecar:
+      enabled: true
+    authorizationPolicies:
+      enabled: true
+      # L4 policy for dummies
+      generateFromNetpol: true
 
-packages HelmRelease updated to include valuesFrom that includes a global `bigbang-platform-values`:
-
-```yaml
-valuesFrom:
-  - name: {{ $.Release.Name }}-platform-values
-    kind: ConfigMap
-    valuesKey: common.yaml
-  - name: {{ $pkg }}-values
-    kind: Secret
+  routes:
+    inbound:
+      podinfo:
+        enabled: true
+        hosts:
+          - podinfo.dev.bigbang.mil
+        gateways:
+          - istio-gateway/public-ingressgateway
+        service: podinfo-upstream
+        port: 9898
+        selector:
+          app.kubernetes.io/name: podinfo-upstream
 ```
