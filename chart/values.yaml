@@ -1,3 +1,14 @@
+upstream:
+  image:
+    repository: registry1.dso.mil/ironbank/opensource/bigbang/podinfo
+    tag: 6.10.1
+  serviceMonitor:
+    enabled: true
+  redis:
+    enabled: true
+    repository: registry1.dso.mil/ironbank/opensource/redis/redis8-slim
+    tag: 8.6.1
+
 bb-common:
   networkPolicies:
     enabled: true
@@ -6,11 +17,6 @@ bb-common:
       enabled: true
     ingress:
       to:
-        podinfo-upstream:9898:
-          from:
-            k8s:
-              monitoring-monitoring-kube-prometheus@monitoring/prometheus:
-                enabled: true
         redis:6379:
           podSelector:
             matchLabels:
@@ -37,15 +43,4 @@ bb-common:
         port: 9898
         selector:
           app.kubernetes.io/name: podinfo-upstream
-
-upstream:
-  image:
-    repository: registry1.dso.mil/ironbank/opensource/bigbang/podinfo
-    tag: 6.10.1
-  serviceMonitor:
-    enabled: true
-  redis:
-    enabled: true
-    repository: registry1.dso.mil/ironbank/opensource/redis/redis8-slim
-    tag: 8.6.1
 
