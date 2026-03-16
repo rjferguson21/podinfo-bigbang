@@ -10,6 +10,8 @@ upstream:
     tag: 8.6.1
 
 bb-common:
+  # schema validation to keep you on track
+  # foo: bar
   networkPolicies:
     enabled: true
     # injects HBONE port into network policies to ensure ztunnel traffic is permitted
@@ -27,8 +29,11 @@ bb-common:
 
   istio:
     enabled: true
+    sidecar:
+      enabled: true
     authorizationPolicies:
       enabled: true
+      # L4 policy for dummies
       generateFromNetpol: true
 
   routes:
