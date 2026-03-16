@@ -1,21 +1,16 @@
-global:
-  domain: dev.bigbang.mil
-
-  monitoring:
-    enabled: false
-
-  ambient: false
-
 bb-common:
   networkPolicies:
     enabled: true
+    # injects HBONE port into network policies to ensure ztunnel traffic is permitted
+    hbonePortInjection:
+      enabled: true
     ingress:
       to:
         podinfo-upstream:9898:
           from:
             k8s:
               monitoring-monitoring-kube-prometheus@monitoring/prometheus:
-                enabled: "{{ .Values.global.monitoring.enabled }}"
+                enabled: true
         redis:6379:
           podSelector:
             matchLabels:
@@ -35,7 +30,7 @@ bb-common:
       podinfo:
         enabled: true
         hosts:
-          - podinfo.{{ .Values.global.domain }}
+          - podinfo.dev.bigbang.mil
         gateways:
           - istio-gateway/public-ingressgateway
         service: podinfo-upstream

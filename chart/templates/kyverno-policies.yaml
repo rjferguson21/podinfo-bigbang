@@ -1,33 +1,27 @@
-{{- if and .Values.global.monitoring.enabled (not .Values.global.ambient) }}
 apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+kind: Policy
 metadata:
-  name: {{ .Release.Name }}-mutate-servicemonitor-mtls
+  name: {{ .Release.Name }}-redis-protected-mode
+  namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: {{ .Chart.Name }}
     app.kubernetes.io/instance: {{ .Release.Name }}
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "-5"
 spec:
   rules:
-    - name: add-mtls-to-endpoints
+    - name: disable-redis-protected-mode
       match:
         any:
           - resources:
               kinds:
-                - ServiceMonitor
-              namespaces:
-                - {{ .Release.Namespace }}
+                - ConfigMap
+              names:
+                - "*-redis"
       mutate:
-        foreach:
-          - list: "request.object.spec.endpoints"
-            patchesJson6902: |-
-              - op: add
-                path: /spec/endpoints/{{`{{elementIndex}}`}}/scheme
-                value: https
-              - op: add
-                path: /spec/endpoints/{{`{{elementIndex}}`}}/tlsConfig
-                value:
-                  caFile: /etc/prom-certs/root-cert.pem
-                  certFile: /etc/prom-certs/cert-chain.pem
-                  keyFile: /etc/prom-certs/key.pem
-                  insecureSkipVerify: true
-{{- end }}
+        patchStrategicMerge:
+          data:
+            redis.conf: |-
+              {{`{{request.object.data."redis.conf"}}`}}
+              protected-mode no

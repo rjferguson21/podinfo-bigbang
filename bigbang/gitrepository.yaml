@@ -7,4 +7,4 @@ spec:
   interval: 5m
   url: https://repo1.dso.mil/big-bang/product/maintained/podinfo.git
   ref:
-    branch: maintained
+    branch: ambient
