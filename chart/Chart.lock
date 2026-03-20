@@ -1,12 +1,12 @@
 dependencies:
 - name: podinfo
   repository: https://stefanprodan.github.io/podinfo
-  version: 6.7.1
+  version: 6.11.1
 - name: bb-common
   repository: oci://registry1.dso.mil/bigbang
   version: 0.14.1
 - name: gluon
   repository: oci://registry1.dso.mil/bigbang
   version: 0.9.8
-digest: sha256:77d38bda029dc8f52aea59541ba08c183cb0a3ef7c3075fbb0febb2af84e6650
-generated: "2026-03-20T09:20:46.790122075-05:00"
+digest: sha256:7dcc9a817017bcac2129daa68a7926c262a0a8003a5254ab001941bf3f8699d9
+generated: "2026-03-20T10:00:11.970085006-05:00"
