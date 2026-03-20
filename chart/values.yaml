@@ -15,7 +15,7 @@ bb-common:
           from:
             k8s:
               monitoring-monitoring-kube-prometheus@monitoring/prometheus:
-                enabled: "{{ .Values.global.monitoring.enabled }}"
+                enabled: true
         redis:6379:
           podSelector:
             matchLabels:

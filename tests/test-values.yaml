@@ -8,3 +8,4 @@ packages:
     sourceType: "git"
     git:
       repo: https://repo1.dso.mil/big-bang/product/maintained/podinfo.git
+    bbCommonValues: true
