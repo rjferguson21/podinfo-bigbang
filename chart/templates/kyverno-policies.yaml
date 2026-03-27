@@ -50,17 +50,14 @@ spec:
                 - Pod
               namespaces:
                 - {{ .Release.Namespace }}
-              selector:
-                matchLabels:
-                  helm.sh/chart: {{ .Chart.Name }}
       preconditions:
         all:
           - key: "{{ `{{ request.object.metadata.annotations.\"helm.sh/hook\" || '' }}` }}"
             operator: AnyIn
             value: ["test", "test-success"]
       mutate:
-        patchStrategicMerge:
-          metadata:
-            annotations:
-              sidecar.istio.io/inject: "true"
+        patchesJson6902: |-
+          - op: replace
+            path: /metadata/annotations/sidecar.istio.io~1inject
+            value: "true"
 {{- end }}
