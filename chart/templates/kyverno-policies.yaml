@@ -31,3 +31,36 @@ spec:
                   keyFile: /etc/prom-certs/key.pem
                   insecureSkipVerify: true
 {{- end }}
+---
+{{- if not .Values.global.ambient }}
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ .Release.Name }}-mutate-test-sidecar-inject
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  rules:
+    - name: inject-sidecar-into-helm-tests
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - {{ .Release.Namespace }}
+              selector:
+                matchLabels:
+                  helm.sh/chart: {{ .Chart.Name }}
+      preconditions:
+        all:
+          - key: "{{ `{{ request.object.metadata.annotations.\"helm.sh/hook\" || '' }}` }}"
+            operator: AnyIn
+            value: ["test", "test-success"]
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            annotations:
+              sidecar.istio.io/inject: "true"
+{{- end }}
