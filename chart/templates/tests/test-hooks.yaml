@@ -1,0 +1,160 @@
+{{- if index .Values "bb-common" "istio" "enabled" }}
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ .Release.Name }}-allow-helm-test-no-identity
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-5"
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  action: ALLOW
+  rules:
+    - to:
+        - operation:
+            ports:
+              - "9898"
+              - "9999"
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-upstream
+---
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: {{ .Release.Name }}-allow-plaintext-helm-test
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-5"
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  mtls:
+    mode: STRICT
+  portLevelMtls:
+    "9898":
+      mode: PERMISSIVE
+    "9999":
+      mode: PERMISSIVE
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}-upstream
+{{- end }}
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ .Release.Name }}-mutate-jwt-test
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-5"
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  rules:
+    - name: add-sleep-to-jwt-test
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - {{ .Release.Namespace }}
+      preconditions:
+        all:
+          - key: "{{ `{{ request.object.metadata.annotations.\"helm.sh/hook\" || '' }}` }}"
+            operator: AnyIn
+            value: ["test", "test-success"]
+          - key: "{{ `{{ request.object.spec.containers[0].image }}` }}"
+            operator: Equals
+            value: "giantswarm/tiny-tools"
+      mutate:
+        patchesJson6902: |-
+          - op: replace
+            path: /spec/containers/0/command/2
+            value: |
+              sleep 3
+              RESP=$(curl -s -d 'test' ${PODINFO_SVC}/token)
+              TOKEN=$(echo "$RESP" | jq -r .token)
+              curl -s -H "Authorization: Bearer ${TOKEN}" ${PODINFO_SVC}/token/validate | grep test
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ .Release.Name }}-mutate-service-test
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-5"
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  rules:
+    - name: add-sleep-to-curl
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - {{ .Release.Namespace }}
+      preconditions:
+        all:
+          - key: "{{ `{{ request.object.metadata.annotations.\"helm.sh/hook\" || '' }}` }}"
+            operator: AnyIn
+            value: ["test", "test-success"]
+          - key: "{{ `{{ request.object.spec.containers[0].name }}` }}"
+            operator: Equals
+            value: "curl"
+      mutate:
+        patchesJson6902: |-
+          - op: replace
+            path: /spec/containers/0/command/2
+            value: |
+              sleep 3
+              curl -s ${PODINFO_SVC}/api/info | grep version
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: {{ .Release.Name }}-mutate-grpc-test-timeout
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+    helm.sh/hook-weight: "-5"
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  rules:
+    - name: add-grpc-timeout
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - {{ .Release.Namespace }}
+      preconditions:
+        all:
+          - key: "{{ `{{ request.object.metadata.annotations.\"helm.sh/hook\" || '' }}` }}"
+            operator: AnyIn
+            value: ["test", "test-success"]
+          - key: "{{ `{{ request.object.spec.containers[0].name }}` }}"
+            operator: Equals
+            value: "grpc-health-probe"
+      mutate:
+        patchesJson6902: |-
+          - op: add
+            path: /spec/containers/0/args/-
+            value: "-connect-timeout=5s"
