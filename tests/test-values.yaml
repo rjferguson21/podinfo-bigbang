@@ -9,3 +9,71 @@ packages:
     git:
       repo: https://repo1.dso.mil/big-bang/product/maintained/podinfo.git
     bbCommonValues: true
+
+kyvernoPolicies:
+  values:
+    policies:
+      restrict-host-path-mount:
+        exclude:
+          any:
+            - resources:
+                namespaces:
+                  - podinfo
+                names:
+                  - podinfo*
+      restrict-host-path-write:
+        exclude:
+          any:
+            - resources:
+                namespaces:
+                  - podinfo
+                names:
+                  - podinfo*
+      restrict-volume-types:
+        exclude:
+          any:
+            - resources:
+                namespaces:
+                  - podinfo
+                names:
+                  - podinfo*
+      require-non-root-group:
+        exclude:
+          any:
+            - resources:
+                namespaces:
+                  - podinfo
+                names:
+                  - podinfo*
+      require-non-root-user:
+        exclude:
+          any:
+            - resources:
+                namespaces:
+                  - podinfo
+                names:
+                  - podinfo*
+      disallow-image-tags:
+        exclude:
+          any:
+            - resources:
+                namespaces:
+                  - podinfo
+                names:
+                  - podinfo*
+      require-drop-all-capabilities:
+        exclude:
+          any:
+            - resources:
+                namespaces:
+                  - podinfo
+                names:
+                  - podinfo*
+      restrict-image-registries:
+        exclude:
+          any:
+            - resources:
+                namespaces:
+                  - podinfo
+                names:
+                  - podinfo*
